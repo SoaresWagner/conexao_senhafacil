@@ -1,0 +1,50 @@
+name: Compilar Conexao Remota (Windows)
+
+on:
+  workflow_dispatch:
+    inputs:
+      public_key:
+        description: 'Cole aqui sua chave id_ed25519.pub'
+        required: true
+        default: 'COLE_SUA_CHAVE_AQUI'
+
+jobs:
+  build-windows:
+    runs-on: windows-2022
+    env:
+      VCPKG_ROOT: ${{ github.workspace }}\vcpkg
+    steps:
+      - name: 1. Baixar repositorio e submodulos (incluindo hbb_common)
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: 2. Injetar Servidor, API, Key e Nome no hbb_common e src
+        shell: pwsh
+        run: |
+          # Edita o submodulo libs/hbb_common/src/config.rs que foi baixado localmente no runner
+          $configPath = "libs/hbb_common/src/config.rs"
+          $config = Get-Content $configPath -Raw
+          
+          # Troca o nome do aplicativo
+          $config = $config -replace 'pub static ref APP_NAME: RwLock<String> = RwLock::new\("RustDesk"\.to_owned\(\)\);', 'pub static ref APP_NAME: RwLock<String> = RwLock::new("Conexão Remota".to_owned());'
+          
+          # Troca o servidor ID/Relay padrao
+          $config = $config -replace 'pub const RENDEZVOUS_SERVERS: &\[&str\] = &\[[^\]]*\];', 'pub const RENDEZVOUS_SERVERS: &[&str] = &["conexao.senhafacil.app.br:21116"];'
+          
+          # Troca a Chave Publica (RS_PUB_KEY)
+          $config = $config -replace 'pub const RS_PUB_KEY: &str = "[^"]*";', ('pub const RS_PUB_KEY: &str = "' + "${{ inputs.public_key }}" + '";')
+          
+          Set-Content -Path $configPath -Value $config -Encoding UTF8
+
+          # Troca o API Server padrao em src/common.rs
+          $commonPath = "src/common.rs"
+          $common = Get-Content $commonPath -Raw
+          $common = $common -replace 'https://admin\.rustdesk\.com', 'https://conexao.senhafacil.app.br'
+          Set-Content -Path $commonPath -Value $common -Encoding UTF8
+
+          # Verifica no log se as substituicoes funcionaram
+          Select-String -Path $configPath -Pattern "APP_NAME|RENDEZVOUS_SERVERS|RS_PUB_KEY"
+
+      - name: 3. Chamar o Build Oficial de Windows do RustDesk
+        uses: ./.github/workflows/flutter-build.yml
