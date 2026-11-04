@@ -215,8 +215,10 @@ class GroupModel {
       return true;
     } catch (err) {
       debugPrint('get accessible users: $err');
-      groupLoadError.value =
-          '${translate('pull_group_failed_tip')}: ${translate(err.toString())}';
+      if (!err.toString().contains('404')) {
+        groupLoadError.value =
+            '${translate('pull_group_failed_tip')}: ${translate(err.toString())}';
+      }
     }
     return false;
   }
@@ -275,13 +277,18 @@ class GroupModel {
       return true;
     } catch (err) {
       debugPrint('get accessible peers: $err');
-      groupLoadError.value =
-          '${translate('pull_group_failed_tip')}: ${translate(err.toString())}';
+      if (!err.toString().contains('404')) {
+        groupLoadError.value =
+            '${translate('pull_group_failed_tip')}: ${translate(err.toString())}';
+      }
     }
     return false;
   }
 
   Map<String, dynamic> _jsonDecodeResp(String body, int statusCode) {
+    if (statusCode == 404) {
+      return <String, dynamic>{};
+    }
     try {
       Map<String, dynamic> json = jsonDecode(body);
       return json;
@@ -367,6 +374,10 @@ class GroupModel {
   }
 
   void _tryHandlePullError() {
+    if (groupLoadError.value.contains('404')) {
+      groupLoadError.value = '';
+      return;
+    }
     String errorMessage = groupLoadError.value;
     // The error message is "Retrieving accessible devices is disabled."
     if (errorMessage.toLowerCase().contains('disabled')) {

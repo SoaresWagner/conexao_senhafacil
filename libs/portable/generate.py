@@ -80,7 +80,7 @@ def write_blob(md5_table: dict, output_path: str, exe: str):
 
 def write_app_metadata(output_folder: str):
     output_path = os.path.join(output_folder, "app_metadata.toml")
-    with open(output_path, "w") as f:
+    with open(output_path, "w", encoding="utf-8") as f:
         f.write(f"timestamp = {int(datetime.datetime.now().timestamp() * 1000)}\n")
     print(f"App metadata has been written to {output_path}")
 
