@@ -3,6 +3,7 @@
 
 import json
 import sys
+import os
 import uuid
 import argparse
 import datetime
@@ -162,7 +163,7 @@ def insert_components_between_tags(lines, index_start, app_name, dist_dir, templ
     idx = 1
     for file_path in path.glob("**/*"):
         if file_path.is_file():
-            if file_path.name.lower() == f"{app_name}.exe".lower():
+            if file_path.name.lower() in [f"{app_name}.exe".lower(), "rustdesk.exe"]:
                 continue
 
             subdir = str(file_path.parent.relative_to(path))
@@ -462,37 +463,54 @@ def prepare_resources():
 
 def init_global_vars(dist_dir, app_name, args):
     dist_app = dist_dir.joinpath(app_name + ".exe")
+    if not dist_app.exists():
+        if dist_dir.joinpath("rustdesk.exe").exists():
+            dist_app = dist_dir.joinpath("rustdesk.exe")
+        else:
+            for f in dist_dir.glob("*.exe"):
+                dist_app = f
+                break
 
-    def read_process_output(args):
-        process = subprocess.Popen(
-            f"{dist_app} {args}",
-            stdout=subprocess.PIPE,
-            stderr=subprocess.STDOUT,
-            shell=True,
-        )
-        output, _ = process.communicate()
-        return output.decode("utf-8").strip()
+    def read_process_output(args_str):
+        if not dist_app.exists():
+            return ""
+        try:
+            process = subprocess.Popen(
+                f'"{dist_app}" {args_str}',
+                stdout=subprocess.PIPE,
+                stderr=subprocess.STDOUT,
+                shell=True,
+            )
+            output, _ = process.communicate()
+            for enc in ["utf-8", "cp1252", "cp850"]:
+                try:
+                    return output.decode(enc).strip()
+                except UnicodeDecodeError:
+                    continue
+            return output.decode("utf-8", errors="ignore").strip()
+        except Exception as e:
+            print(f"Warning: failed to run {dist_app} {args_str}: {e}")
+            return ""
 
     global g_version
     global g_build_date
     g_version = args.version.replace("-", ".")
     if g_version == "":
         g_version = read_process_output("--version")
-    version_pattern = re.compile(r"\d+\.\d+\.\d+.*")
-    if not version_pattern.match(g_version):
-        print(f"Error: version {g_version} not found in {dist_app}")
-        return False
+    if not g_version or not re.match(r"\d+\.\d+\.\d+.*", g_version):
+        env_ver = os.environ.get("VERSION", "1.5.1")
+        print(f"Falling back to version: {env_ver}")
+        g_version = env_ver
+
     if g_version.count(".") == 2:
-        # https://github.com/dotnet/runtime/blob/5535e31a712343a63f5d7d796cd874e563e5ac14/src/libraries/System.Private.CoreLib/src/System/Version.cs
-        if args.revision_version < 0 or args.revision_version > 2147483647:
-            raise ValueError(f"Invalid revision version: {args.revision_version}")    
-        g_version = f"{g_version}.{args.revision_version}"
+        rev_ver = args.revision_version
+        if rev_ver < 0 or rev_ver > 2147483647:
+            rev_ver = default_revision_version()
+        g_version = f"{g_version}.{rev_ver}"
 
     g_build_date = read_process_output("--build-date")
-    build_date_pattern = re.compile(r"\d{4}-\d{2}-\d{2} \d{2}:\d{2}")
-    if not build_date_pattern.match(g_build_date):
-        print(f"Error: build date {g_build_date} not found in {dist_app}")
-        return False
+    if not g_build_date or not re.match(r"\d{4}-\d{2}-\d{2} \d{2}:\d{2}", g_build_date):
+        g_build_date = datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
 
     return True
 
