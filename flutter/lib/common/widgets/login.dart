@@ -667,8 +667,72 @@ class LoginWidgetUserPass extends StatelessWidget {
               controller: pass,
               autoFocus: false,
               reRequestFocus: true,
-              errorText: passMsg,
+              errorText: (passMsg != null && passMsg.toLowerCase().contains('limite de técnicos')) ? null : passMsg,
             ),
+            if (passMsg != null && passMsg.toLowerCase().contains('limite de técnicos')) ...[
+              const SizedBox(height: 10.0),
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(12.0),
+                decoration: BoxDecoration(
+                  color: Colors.amber.withOpacity(0.12),
+                  borderRadius: BorderRadius.circular(10.0),
+                  border: Border.all(color: Colors.amber.shade700, width: 1.2),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Icon(Icons.warning_amber_rounded,
+                            color: Colors.amber.shade700, size: 20),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            'Limite de Conexões Atingido',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 13,
+                              color: Colors.amber.shade800,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      passMsg,
+                      style: const TextStyle(fontSize: 12, height: 1.35),
+                    ),
+                    const SizedBox(height: 8),
+                    InkWell(
+                      onTap: () => launchUrl(
+                        Uri.parse('https://conexao.senhafacil.app.br/dashboard'),
+                        mode: LaunchMode.externalApplication,
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            'Gerenciar sessões ou fazer upgrade',
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600,
+                              color: Theme.of(context).colorScheme.primary,
+                              decoration: TextDecoration.underline,
+                            ),
+                          ),
+                          const SizedBox(width: 4),
+                          Icon(Icons.open_in_new,
+                              size: 14,
+                              color: Theme.of(context).colorScheme.primary),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
             // NOT use Offstage to wrap LinearProgressIndicator
             if (isInProgress) const LinearProgressIndicator(),
             const SizedBox(height: 12.0),
