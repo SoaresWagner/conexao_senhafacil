@@ -651,6 +651,11 @@ class LoginWidgetUserPass extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final currentPassMsg = passMsg;
+    final isTechLimit = currentPassMsg != null &&
+        (currentPassMsg.toLowerCase().contains('limite de técnicos') ||
+            currentPassMsg.toLowerCase().contains('limite de tecnicos'));
+
     return Padding(
         padding: EdgeInsets.all(0),
         child: Column(
@@ -667,9 +672,9 @@ class LoginWidgetUserPass extends StatelessWidget {
               controller: pass,
               autoFocus: false,
               reRequestFocus: true,
-              errorText: (passMsg != null && passMsg.toLowerCase().contains('limite de técnicos')) ? null : passMsg,
+              errorText: isTechLimit ? null : currentPassMsg,
             ),
-            if (passMsg != null && passMsg.toLowerCase().contains('limite de técnicos')) ...[
+            if (isTechLimit && currentPassMsg != null) ...[
               const SizedBox(height: 10.0),
               Container(
                 width: double.infinity,
@@ -701,7 +706,7 @@ class LoginWidgetUserPass extends StatelessWidget {
                     ),
                     const SizedBox(height: 6),
                     Text(
-                      passMsg,
+                      currentPassMsg,
                       style: const TextStyle(fontSize: 12, height: 1.35),
                     ),
                     const SizedBox(height: 8),
