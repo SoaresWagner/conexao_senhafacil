@@ -12,6 +12,7 @@ import '../../consts.dart';
 import '../../common/widgets/overlay.dart';
 import '../../common/widgets/remote_input.dart';
 import '../../common.dart';
+import '../../common/session_tracker.dart';
 import '../../common/widgets/dialog.dart';
 import '../../common/widgets/toolbar.dart';
 import '../../models/model.dart';
@@ -148,6 +149,7 @@ class _RemotePageState extends State<RemotePage>
   @override
   void initState() {
     super.initState();
+    SessionTracker.start(widget.id);
     _ffi = FFI(widget.sessionId);
     if (isMacOS) {
       // SchedulerBinding.instance.lifecycleState is null in the first connection in a new window.
@@ -649,6 +651,7 @@ class _RemotePageState extends State<RemotePage>
 
   @override
   Future<void> dispose() async {
+    unawaited(SessionTracker.end(widget.id));
     final closeSession = closeSessionOnDispose.remove(widget.id) ?? true;
 
     // https://github.com/flutter/flutter/issues/64935

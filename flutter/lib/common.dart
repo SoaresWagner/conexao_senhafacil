@@ -46,6 +46,7 @@ import 'package:flutter_hbb/native/win32.dart'
 import 'package:flutter_hbb/native/common.dart'
     if (dart.library.html) 'package:flutter_hbb/web/common.dart';
 import 'package:flutter_hbb/utils/http_service.dart' as http;
+import 'common/widgets/login.dart';
 
 final globalKey = GlobalKey<NavigatorState>();
 final navigationBarKey = GlobalKey();
@@ -2569,6 +2570,91 @@ connectMainDesktop(String id,
 /// If [isViewCamera], starts a session only for view camera.
 /// If [isTcpTunneling], starts a session only for tcp tunneling.
 /// If [isRDP], starts a session only for rdp.
+/// Trava comercial SaaS: valida autenticação de técnico e limite de sessões/assinatura na API
+Future<bool> authorizeSession(String remoteId) async {
+  final token = bind.mainGetLocalOption(key: 'access_token');
+  if (token.isEmpty || !gFFI.userModel.isLogin) {
+    showToast('Área exclusiva para técnicos. Faça login na sua conta para iniciar atendimentos.');
+    loginDialog();
+    return false;
+  }
+
+  try {
+    final apiServer = await bind.mainGetApiServer();
+    final myId = await bind.mainGetMyId();
+    final uuid = await bind.mainGetUuid();
+
+    final res = await http.post(
+      Uri.parse('$apiServer/api/session/authorize'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
+      },
+      body: jsonEncode({
+        'local_id': myId,
+        'remote_id': remoteId,
+        'uuid': uuid,
+      }),
+    ).timeout(const Duration(seconds: 5));
+
+    if (res.statusCode == 401) {
+      await gFFI.userModel.logOut();
+      showToast('Sessão expirada. Faça login novamente.');
+      loginDialog();
+      return false;
+    }
+
+    if (res.statusCode == 402 || res.statusCode == 403) {
+      String errorMsg = 'Limite de técnicos simultâneos ou assinatura pendente.';
+      try {
+        final data = jsonDecode(decode_http_response(res));
+        if (data is Map && data['message'] != null) {
+          errorMsg = data['message'].toString();
+        }
+      } catch (_) {}
+      _showAuthBlockedDialog(errorMsg);
+      return false;
+    }
+
+    if (res.statusCode == 200) {
+      try {
+        final data = jsonDecode(decode_http_response(res));
+        if (data is Map && data['allowed'] == false) {
+          final errorMsg =
+              (data['message'] ?? 'Conexão não autorizada pelo servidor.')
+                  .toString();
+          _showAuthBlockedDialog(errorMsg);
+          return false;
+        }
+      } catch (_) {}
+      return true;
+    }
+  } catch (e) {
+    debugPrint('[authorizeSession] warning: $e');
+  }
+  return true;
+}
+
+void _showAuthBlockedDialog(String message) {
+  gFFI.dialogManager.show((setState, close, context) => CustomAlertDialog(
+        title: Row(
+          children: [
+            const Icon(Icons.warning_amber_rounded,
+                color: Colors.orange, size: 24),
+            const SizedBox(width: 8),
+            Text(translate('Acesso Não Autorizado')),
+          ],
+        ),
+        content: Text(
+          message,
+          style: const TextStyle(fontSize: 14, height: 1.4),
+        ),
+        actions: [
+          dialogButton('OK', onPressed: close),
+        ],
+      ));
+}
+
 connect(BuildContext context, String id,
     {bool isFileTransfer = false,
     bool isViewCamera = false,
@@ -2593,6 +2679,13 @@ connect(BuildContext context, String id,
     } catch (_) {}
   }
   id = id.replaceAll(' ', '');
+
+  // Trava comercial SaaS
+  final isAuthorized = await authorizeSession(id);
+  if (!isAuthorized) {
+    return;
+  }
+
   final oldId = id;
   id = await bind.mainHandleRelayId(id: id);
   forceRelay = id != oldId || forceRelay;

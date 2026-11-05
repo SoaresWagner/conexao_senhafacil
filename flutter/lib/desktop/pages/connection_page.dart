@@ -17,6 +17,7 @@ import 'package:flutter_hbb/models/peer_model.dart';
 import '../../common.dart';
 import '../../common/formatter/id_formatter.dart';
 import '../../common/widgets/peer_tab_page.dart';
+import '../../common/widgets/login.dart';
 import '../../common/widgets/autocomplete.dart';
 import '../../models/platform_model.dart';
 import '../../desktop/widgets/material_mod_popup_menu.dart' as mod_menu;
@@ -307,21 +308,131 @@ class _ConnectionPageState extends State<ConnectionPage>
     return Column(
       children: [
         Expanded(
-            child: Column(
-          children: [
-            Row(
+          child: Obx(() {
+            final isLogin = gFFI.userModel.userName.value.isNotEmpty;
+            if (!isLogin) {
+              return _buildLoginRequiredCard(context);
+            }
+            return Column(
               children: [
-                Flexible(child: _buildRemoteIDTextField(context)),
+                Row(
+                  children: [
+                    Flexible(child: _buildRemoteIDTextField(context)),
+                  ],
+                ).marginOnly(top: 22),
+                const SizedBox(height: 12),
+                const Divider().paddingOnly(right: 12),
+                const Expanded(child: PeerTabPage()),
               ],
-            ).marginOnly(top: 22),
-            SizedBox(height: 12),
-            Divider().paddingOnly(right: 12),
-            Expanded(child: PeerTabPage()),
-          ],
-        ).paddingOnly(left: 12.0)),
+            ).paddingOnly(left: 12.0);
+          }),
+        ),
         if (!isOutgoingOnly) const Divider(height: 1),
         if (!isOutgoingOnly) OnlineStatusWidget()
       ],
+    );
+  }
+
+  Widget _buildLoginRequiredCard(BuildContext context) {
+    final theme = Theme.of(context);
+    return Center(
+      child: SingleChildScrollView(
+        child: Container(
+          constraints: const BoxConstraints(maxWidth: 440),
+          margin: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 24.0),
+          padding: const EdgeInsets.all(28.0),
+          decoration: BoxDecoration(
+            color: theme.cardColor,
+            borderRadius: BorderRadius.circular(16.0),
+            border: Border.all(color: theme.dividerColor.withOpacity(0.15)),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.04),
+                blurRadius: 16,
+                offset: const Offset(0, 4),
+              ),
+            ],
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Container(
+                padding: const EdgeInsets.all(16.0),
+                decoration: BoxDecoration(
+                  color: theme.colorScheme.primary.withOpacity(0.12),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(
+                  Icons.admin_panel_settings_rounded,
+                  size: 48,
+                  color: theme.colorScheme.primary,
+                ),
+              ),
+              const SizedBox(height: 20),
+              Text(
+                'Área Exclusiva para Técnicos',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: theme.textTheme.titleLarge?.color,
+                ),
+              ),
+              const SizedBox(height: 10),
+              Text(
+                'Faça login na sua conta Conexão Remota para iniciar atendimentos e gerenciar computadores remotos.',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 13,
+                  height: 1.45,
+                  color: theme.textTheme.bodyMedium?.color?.withOpacity(0.75),
+                ),
+              ),
+              const SizedBox(height: 22),
+              SizedBox(
+                height: 42,
+                child: ElevatedButton.icon(
+                  icon: const Icon(Icons.login_rounded, size: 18),
+                  label: const Text(
+                    'Fazer Login com Minha Conta',
+                    style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
+                  ),
+                  style: ElevatedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 0),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                  onPressed: () {
+                    loginDialog();
+                  },
+                ),
+              ),
+              const SizedBox(height: 20),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                decoration: BoxDecoration(
+                  color: theme.dividerColor.withOpacity(0.06),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Row(
+                  children: [
+                    Icon(Icons.info_outline, size: 16, color: theme.hintColor),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        'Clientes que apenas recebem suporte não precisam fazer login — basta informar o ID e a Senha exibidos no painel à esquerda.',
+                        style: TextStyle(fontSize: 11, color: theme.hintColor, height: 1.35),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 

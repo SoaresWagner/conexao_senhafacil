@@ -23,6 +23,7 @@ import 'package:flutter_hbb/web/dummy.dart'
 import '../../consts.dart';
 import '../../desktop/widgets/material_mod_popup_menu.dart' as mod_menu;
 import '../../common.dart';
+import '../../common/session_tracker.dart';
 import '../../models/model.dart';
 import '../../models/platform_model.dart';
 import '../widgets/popup_menu.dart';
@@ -118,10 +119,12 @@ class _FileManagerPageState extends State<FileManagerPage>
       widget.tabController?.onSelected?.call(widget.id);
     });
     WidgetsBinding.instance.addObserver(this);
+    SessionTracker.start(widget.id);
   }
 
   @override
   void dispose() {
+    unawaited(SessionTracker.end(widget.id));
     model.close().whenComplete(() {
       _ffi.close();
       _ffi.dialogManager.dismissAll();

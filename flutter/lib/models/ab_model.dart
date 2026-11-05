@@ -219,8 +219,10 @@ class AbModel {
 
   void _setListPullError(Object err, {required bool quiet, int? statusCode}) {
     if (!quiet) {
-      _listPullError.value =
-          '${translate('pull_ab_failed_tip')}: ${translate(err.toString())}';
+      if (statusCode != 404 && !err.toString().contains('404')) {
+        _listPullError.value =
+            '${translate('pull_ab_failed_tip')}: ${translate(err.toString())}';
+      }
     }
     if (statusCode == 401) {
       gFFI.userModel.reset(resetOther: true);
@@ -1039,8 +1041,10 @@ class LegacyAb extends BaseAb {
       }
     } catch (err) {
       if (!quiet) {
-        pullError.value =
-            '${translate('pull_ab_failed_tip')}: ${translate(err.toString())}';
+        if (statusCode != 404 && !err.toString().contains('404')) {
+          pullError.value =
+              '${translate('pull_ab_failed_tip')}: ${translate(err.toString())}';
+        }
       }
     } finally {
       if (pullError.isNotEmpty) {
