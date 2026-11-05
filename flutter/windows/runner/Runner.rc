@@ -90,12 +90,12 @@ BEGIN
         BLOCK "040904e4"
         BEGIN
             VALUE "CompanyName", "Senha Fácil" "\0"
-            VALUE "FileDescription", "Conexão Remota" "\0"
+            VALUE "FileDescription", "ConexaoRemota" "\0"
             VALUE "FileVersion", VERSION_AS_STRING "\0"
             VALUE "InternalName", "conexaoremota" "\0"
             VALUE "LegalCopyright", "Copyright © 2026 Senha Fácil. All rights reserved." "\0"
             VALUE "OriginalFilename", "conexaoremota.exe" "\0"
-            VALUE "ProductName", "Conexão Remota" "\0"
+            VALUE "ProductName", "ConexaoRemota" "\0"
             VALUE "ProductVersion", VERSION_AS_STRING "\0"
         END
     END

@@ -10,7 +10,7 @@ on:
       app_name:
         description: 'Nome do Aplicativo na Janela'
         required: true
-        default: 'Conexão Remota'
+        default: 'ConexaoRemota'
       hide_network_settings:
         description: 'Ocultar configuracoes de servidor/rede do usuario?'
         type: boolean
