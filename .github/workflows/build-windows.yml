@@ -49,7 +49,7 @@ jobs:
           $content = Get-Content $configFile -Raw
           $content = $content -replace 'pub static ref APP_NAME: RwLock<String> = RwLock::new\("RustDesk"\.to_owned\(\)\);', 'pub static ref APP_NAME: RwLock<String> = RwLock::new("Conexão Remota".to_owned());'
           $content = $content -replace 'pub const RENDEZVOUS_SERVERS: &\[&str\] = &\["rs-ny\.rustdesk\.com"\];', 'pub const RENDEZVOUS_SERVERS: &[&str] = &["conexao.senhafacil.app.br:21116"];'
-          $content = $content -replace 'pub const RS_PUB_KEY: &str = "OeVuKk5nlHiXp\+APNn0Y3pC1Iwpwn44JGqrQCsWqmBw=";', 'pub const RS_PUB_KEY: &str = "COLE_SUA_CHAVE_PUBLICA_AQUI";'
+          $content = $content -replace 'pub const RS_PUB_KEY: &str = "OeVuKk5nlHiXp\+APNn0Y3pC1Iwpwn44JGqrQCsWqmBw=";', 'pub const RS_PUB_KEY: &str = "kHd84DVEmqHbarZxFFMhxvVQh1V9QL9ZqMVW0dIAEbM=";'
           [System.IO.File]::WriteAllText($configFile, $content, [System.Text.Encoding]::UTF8)
           Write-Host "Updated libs/hbb_common/src/config.rs successfully."
 
