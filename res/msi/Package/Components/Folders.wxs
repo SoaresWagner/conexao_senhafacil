@@ -29,7 +29,9 @@
 		<!-- INSTALLFOLDER_INNER is defined for compatibility with previous versions of the installer. -->
 		<!-- Because we need to use INSTALLFOLDER as the command line argument. -->
 		<StandardDirectory Id="ProgramFiles6432Folder">
-			<Directory Id="INSTALLFOLDER_INNER" Name="$(var.Product)" />
+			<Directory Id="CompanyFolder" Name="SenhaFacil">
+				<Directory Id="INSTALLFOLDER_INNER" Name="ConexaoRemota" />
+			</Directory>
 		</StandardDirectory>
 
 		<StandardDirectory Id="CommonAppDataFolder">
