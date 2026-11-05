@@ -683,8 +683,8 @@ pub async fn start_server(is_server: bool, no_server: bool) {
                 if crate::is_server() {
                     log::error!("ipc is occupied by another process, try kill it");
                     std::thread::spawn(stop_main_window_process).join().ok();
+                    std::process::exit(-1);
                 }
-                std::process::exit(-1);
             }
         });
         // Warm the DRM availability cache before any client connects, so the first connection does
