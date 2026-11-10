@@ -1,4 +1,4 @@
-name: Build Android (Conexao Remota)
+name: Build Android (Conexao Senha Facil)
 
 on:
   workflow_dispatch:
@@ -104,7 +104,7 @@ jobs:
           python3 -c "
           with open('libs/hbb_common/src/config.rs', 'r', encoding='utf-8') as f:
               c = f.read()
-          c = c.replace('\"RustDesk\".to_owned()', '\"ConexaoRemota\".to_owned()')
+          c = c.replace('\"RustDesk\".to_owned()', '\"ConexaoSenhaFacil\".to_owned()')
           c = c.replace('&[\"rs-ny.rustdesk.com\"]', '&[\"conexao.senhafacil.app.br:21116\"]')
           c = c.replace('\"OeVuKk5nlHiXp+APNn0Y3pC1Iwpwn44JGqrQCsWqmBw=\"', '\"kHd84DVEmqHbarZxFFMhxvVQh1V9QL9ZqMVW0dIAEbM=\"')
           with open('libs/hbb_common/src/config.rs', 'w', encoding='utf-8') as f:
@@ -206,13 +206,13 @@ jobs:
           flutter build apk --release --target-platform ${{ matrix.job.flutter_target }} --split-per-abi
           popd
           mkdir -p ./Output
-          mv ./flutter/build/app/outputs/flutter-apk/app-${{ matrix.job.arch }}-release.apk ./Output/ConexaoRemota-${{ env.VERSION }}-${{ matrix.job.arch }}.apk
+          mv ./flutter/build/app/outputs/flutter-apk/app-${{ matrix.job.arch }}-release.apk ./Output/ConexaoSenhaFacil-${{ env.VERSION }}-${{ matrix.job.arch }}.apk
 
       - name: Upload APK (${{ matrix.job.arch }})
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
-          name: ConexaoRemota-${{ env.VERSION }}-${{ matrix.job.arch }}
-          path: ./Output/ConexaoRemota-${{ env.VERSION }}-${{ matrix.job.arch }}.apk
+          name: ConexaoSenhaFacil-${{ env.VERSION }}-${{ matrix.job.arch }}
+          path: ./Output/ConexaoSenhaFacil-${{ env.VERSION }}-${{ matrix.job.arch }}.apk
 
   build-android-universal:
     name: build android universal apk
@@ -246,7 +246,7 @@ jobs:
           python3 -c "
           with open('libs/hbb_common/src/config.rs', 'r', encoding='utf-8') as f:
               c = f.read()
-          c = c.replace('\"RustDesk\".to_owned()', '\"ConexaoRemota\".to_owned()')
+          c = c.replace('\"RustDesk\".to_owned()', '\"ConexaoSenhaFacil\".to_owned()')
           c = c.replace('&[\"rs-ny.rustdesk.com\"]', '&[\"conexao.senhafacil.app.br:21116\"]')
           c = c.replace('\"OeVuKk5nlHiXp+APNn0Y3pC1Iwpwn44JGqrQCsWqmBw=\"', '\"kHd84DVEmqHbarZxFFMhxvVQh1V9QL9ZqMVW0dIAEbM=\"')
           with open('libs/hbb_common/src/config.rs', 'w', encoding='utf-8') as f:
@@ -312,10 +312,10 @@ jobs:
           flutter build apk --release --target-platform android-arm,android-arm64
           popd
           mkdir -p ./Output
-          mv ./flutter/build/app/outputs/flutter-apk/app-release.apk ./Output/ConexaoRemota-${{ env.VERSION }}-universal.apk
+          mv ./flutter/build/app/outputs/flutter-apk/app-release.apk ./Output/ConexaoSenhaFacil-${{ env.VERSION }}-universal.apk
 
       - name: Upload Universal APK
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
-          name: ConexaoRemota-${{ env.VERSION }}-universal
-          path: ./Output/ConexaoRemota-${{ env.VERSION }}-universal.apk
+          name: ConexaoSenhaFacil-${{ env.VERSION }}-universal
+          path: ./Output/ConexaoSenhaFacil-${{ env.VERSION }}-universal.apk

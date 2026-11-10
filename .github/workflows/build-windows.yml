@@ -1,4 +1,4 @@
-name: Build Windows x64 (Conexao Remota)
+name: Build Windows x64 (Conexao Senha Facil)
 
 on:
   workflow_dispatch:
@@ -47,7 +47,7 @@ jobs:
         run: |
           $configFile = "libs/hbb_common/src/config.rs"
           $content = Get-Content $configFile -Raw
-          $content = $content -replace 'pub static ref APP_NAME: RwLock<String> = RwLock::new\("RustDesk"\.to_owned\(\)\);', 'pub static ref APP_NAME: RwLock<String> = RwLock::new("ConexaoRemota".to_owned());'
+          $content = $content -replace 'pub static ref APP_NAME: RwLock<String> = RwLock::new\("RustDesk"\.to_owned\(\)\);', 'pub static ref APP_NAME: RwLock<String> = RwLock::new("ConexaoSenhaFacil".to_owned());'
           $content = $content -replace 'pub const RENDEZVOUS_SERVERS: &\[&str\] = &\["rs-ny\.rustdesk\.com"\];', 'pub const RENDEZVOUS_SERVERS: &[&str] = &["conexao.senhafacil.app.br:21116"];'
           $content = $content -replace 'pub const RS_PUB_KEY: &str = "OeVuKk5nlHiXp\+APNn0Y3pC1Iwpwn44JGqrQCsWqmBw=";', 'pub const RS_PUB_KEY: &str = "kHd84DVEmqHbarZxFFMhxvVQh1V9QL9ZqMVW0dIAEbM=";'
           [System.IO.File]::WriteAllText($configFile, $content, [System.Text.Encoding]::UTF8)
@@ -193,13 +193,13 @@ jobs:
         shell: bash
         run: |
           sed -i '/dpiAware/d' res/manifest.xml
-          cp -f ./rustdesk/rustdesk.exe ./rustdesk/ConexaoRemota.exe
+          cp -f ./rustdesk/rustdesk.exe ./rustdesk/ConexaoSenhaFacil.exe
           pushd ./libs/portable
           pip3 install -r requirements.txt
-          python3 ./generate.py -f ../../rustdesk/ -o . -e ../../rustdesk/ConexaoRemota.exe
+          python3 ./generate.py -f ../../rustdesk/ -o . -e ../../rustdesk/ConexaoSenhaFacil.exe
           popd
           mkdir -p ./SignOutput
-          mv ./target/release/rustdesk-portable-packer.exe ./SignOutput/ConexaoRemota-${{ env.VERSION }}-x86_64.exe
+          mv ./target/release/rustdesk-portable-packer.exe ./SignOutput/ConexaoSenhaFacil-${{ env.VERSION }}-x86_64.exe
 
       - name: Add MSBuild to PATH
         uses: microsoft/setup-msbuild@6fb02220983dee41ce7ae257b6f4d8f9bf5ed4ce # v2
@@ -209,7 +209,7 @@ jobs:
       - name: Build msi
         run: |
           if (Test-Path "./rustdesk/rustdesk.exe") {
-            Copy-Item -Force "./rustdesk/rustdesk.exe" "./rustdesk/ConexaoRemota.exe"
+            Copy-Item -Force "./rustdesk/rustdesk.exe" "./rustdesk/ConexaoSenhaFacil.exe"
           }
           pushd ./res/msi
           python preprocess.py --arp -d ../../rustdesk
@@ -218,12 +218,12 @@ jobs:
           msbuild msi.sln -p:Configuration=Release -p:Platform=x64 /p:TargetVersion=Windows10
           if ($LASTEXITCODE -ne 0) { throw "msbuild failed with exit code $LASTEXITCODE" }
           $msi = Get-ChildItem ./Package/bin/*/Release/en-us/Package.msi | Select-Object -First 1
-          mv $msi.FullName ../../SignOutput/ConexaoRemota-${{ env.VERSION }}-x86_64.msi
+          mv $msi.FullName ../../SignOutput/ConexaoSenhaFacil-${{ env.VERSION }}-x86_64.msi
           sha256sum ../../SignOutput/*.msi
 
       - name: Upload installers (EXE and MSI)
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
-          name: ConexaoRemota-Windows-x86_64-Setup
+          name: ConexaoSenhaFacil-Windows-x86_64-Setup
           path: ./SignOutput
 

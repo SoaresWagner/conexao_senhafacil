@@ -296,7 +296,7 @@ class _InstallPageBodyState extends State<_InstallPageBody>
     String? install_path = await FilePicker.platform
         .getDirectoryPath(initialDirectory: controller.text);
     if (install_path != null) {
-      controller.text = join(install_path, "SenhaFacil", "ConexaoRemota");
+      controller.text = join(install_path, "SenhaFacil", "ConexaoSenhaFacil");
     }
   }
 }

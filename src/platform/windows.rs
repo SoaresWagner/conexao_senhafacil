@@ -1444,7 +1444,7 @@ fn get_default_install_path() -> String {
             pf = tmp;
         }
     }
-    format!("{}\\SenhaFacil\\ConexaoRemota", pf)
+    format!("{}\\SenhaFacil\\ConexaoSenhaFacil", pf)
 }
 
 pub fn check_update_broker_process() -> ResultType<()> {

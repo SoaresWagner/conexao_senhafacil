@@ -381,7 +381,7 @@ class _ConnectionPageState extends State<ConnectionPage>
               ),
               const SizedBox(height: 10),
               Text(
-                'Faça login na sua conta Conexão Remota para iniciar atendimentos e gerenciar computadores remotos.',
+                'Faça login na sua conta Conexão Senha Fácil para iniciar atendimentos e gerenciar computadores remotos.',
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 13,

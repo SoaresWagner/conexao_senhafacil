@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Conexão Remota</string>
-    <string name="accessibility_service_description">Permitir que outros dispositivos controlem este aparelho usando toques virtuais, quando o compartilhamento de tela do Conexão Remota estiver estabelecido</string>
-    <string name="foreground_service_special_use_subtype">Mantém o host do Conexão Remota disponível para conexões autorizadas e notificações em primeiro plano sem iniciar captura de tela antes da aprovação do usuário.</string>
+    <string name="app_name">Conexão Senha Fácil</string>
+    <string name="accessibility_service_description">Permitir que outros dispositivos controlem este aparelho usando toques virtuais, quando o compartilhamento de tela do Conexão Senha Fácil estiver estabelecido</string>
+    <string name="foreground_service_special_use_subtype">Mantém o host do Conexão Senha Fácil disponível para conexões autorizadas e notificações em primeiro plano sem iniciar captura de tela antes da aprovação do usuário.</string>
 </resources>

@@ -27,7 +27,7 @@ jobs:
           $config = Get-Content $configPath -Raw
           
           # Troca o nome do aplicativo
-          $config = $config -replace 'pub static ref APP_NAME: RwLock<String> = RwLock::new\("RustDesk"\.to_owned\(\)\);', 'pub static ref APP_NAME: RwLock<String> = RwLock::new("ConexaoRemota".to_owned());'
+          $config = $config -replace 'pub static ref APP_NAME: RwLock<String> = RwLock::new\("RustDesk"\.to_owned\(\)\);', 'pub static ref APP_NAME: RwLock<String> = RwLock::new("ConexaoSenhaFacil".to_owned());'
           
           # Troca o servidor ID/Relay padrao
           $config = $config -replace 'pub const RENDEZVOUS_SERVERS: &\[&str\] = &\[[^\]]*\];', 'pub const RENDEZVOUS_SERVERS: &[&str] = &["conexao.senhafacil.app.br:21116"];'

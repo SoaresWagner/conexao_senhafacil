@@ -3114,7 +3114,7 @@ int versionCmp(String v1, String v2) {
 }
 
 String getWindowName({WindowType? overrideType}) {
-  final name = "Conexão Remota";
+  final name = "Conexão Senha Fácil";
   switch (overrideType ?? kWindowType) {
     case WindowType.Main:
       return name;

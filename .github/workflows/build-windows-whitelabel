@@ -10,7 +10,7 @@ on:
       app_name:
         description: 'Nome do Aplicativo na Janela'
         required: true
-        default: 'ConexaoRemota'
+        default: 'ConexaoSenhaFacil'
       hide_network_settings:
         description: 'Ocultar configuracoes de servidor/rede do usuario?'
         type: boolean
@@ -205,7 +205,7 @@ jobs:
           name: topmostwindow-artifacts-x64
           path: "./rustdesk"
 
-      - name: Gerar Executavel Final (ConexaoRemota.exe)
+      - name: Gerar Executavel Final (ConexaoSenhaFacil.exe)
         shell: bash
         run: |
           sed -i '/dpiAware/d' res/manifest.xml
@@ -214,10 +214,10 @@ jobs:
           python3 ./generate.py -f ../../rustdesk/ -o . -e ../../rustdesk/rustdesk.exe
           popd
           mkdir -p ./OutputExe
-          mv ./target/release/rustdesk-portable-packer.exe ./OutputExe/ConexaoRemota-Setup.exe
+          mv ./target/release/rustdesk-portable-packer.exe ./OutputExe/ConexaoSenhaFacil-Setup.exe
 
       - name: Disponibilizar Executavel para Download (Artifact)
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
         with:
-          name: ConexaoRemota-Windows-x64
-          path: ./OutputExe/ConexaoRemota-Setup.exe
+          name: ConexaoSenhaFacil-Windows-x64
+          path: ./OutputExe/ConexaoSenhaFacil-Setup.exe

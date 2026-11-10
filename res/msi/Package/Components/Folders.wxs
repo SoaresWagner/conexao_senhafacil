@@ -30,7 +30,7 @@
 		<!-- Because we need to use INSTALLFOLDER as the command line argument. -->
 		<StandardDirectory Id="ProgramFiles6432Folder">
 			<Directory Id="CompanyFolder" Name="SenhaFacil">
-				<Directory Id="INSTALLFOLDER_INNER" Name="ConexaoRemota" />
+				<Directory Id="INSTALLFOLDER_INNER" Name="ConexaoSenhaFacil" />
 			</Directory>
 		</StandardDirectory>
 
