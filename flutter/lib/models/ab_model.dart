@@ -2005,24 +2005,30 @@ List<dynamic> _jsonDecodeRespList(String body, int statusCode) {
 
 String _jsonDecodeActionResp(http.Response resp) {
   var errMsg = '';
-  if (resp.statusCode == 200 && resp.body.isEmpty) {
-    // ok
+  if (resp.statusCode == 200) {
+    if (resp.body.isEmpty || resp.body.toLowerCase() == 'null') {
+      return '';
+    }
+    try {
+      final decoded = jsonDecode(resp.body);
+      if (decoded is Map && decoded['error'] != null) {
+        return decoded['error'].toString();
+      }
+      return '';
+    } catch (_) {
+      return '';
+    }
   } else {
     try {
-      errMsg = jsonDecode(resp.body)['error'].toString();
+      final decoded = jsonDecode(resp.body);
+      if (decoded is Map && decoded['error'] != null) {
+        errMsg = decoded['error'].toString();
+      }
     } catch (_) {}
     if (errMsg.isEmpty) {
-      if (resp.statusCode != 200) {
-        errMsg = 'HTTP ${resp.statusCode}';
-      }
+      errMsg = 'HTTP ${resp.statusCode}';
       if (resp.body.isNotEmpty) {
-        if (errMsg.isNotEmpty) {
-          errMsg += ', ';
-        }
-        errMsg += resp.body;
-      }
-      if (errMsg.isEmpty) {
-        errMsg = "unknown error";
+        errMsg += ', ${resp.body}';
       }
     }
   }
