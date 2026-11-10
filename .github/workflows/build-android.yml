@@ -201,7 +201,9 @@ jobs:
         run: |
           export PATH=/usr/lib/jvm/java-17-openjdk-amd64/bin:$PATH
           sed -i "s/org.gradle.jvmargs=-Xmx1024M/org.gradle.jvmargs=-Xmx2g/g" ./flutter/android/gradle.properties
-          sed -i "s/signingConfigs.release/signingConfigs.debug/g" ./flutter/android/app/build.gradle
+          if [ ! -f ./flutter/android/key.properties ]; then
+            sed -i "s/signingConfigs.release/signingConfigs.debug/g" ./flutter/android/app/build.gradle
+          fi
           pushd flutter
           flutter build apk --release --target-platform ${{ matrix.job.flutter_target }} --split-per-abi
           popd
@@ -305,17 +307,37 @@ jobs:
         run: |
           export PATH=/usr/lib/jvm/java-17-openjdk-amd64/bin:$PATH
           sed -i "s/org.gradle.jvmargs=-Xmx1024M/org.gradle.jvmargs=-Xmx2g/g" ./flutter/android/gradle.properties
-          sed -i "s/signingConfigs.release/signingConfigs.debug/g" ./flutter/android/app/build.gradle
+          if [ ! -f ./flutter/android/key.properties ]; then
+            sed -i "s/signingConfigs.release/signingConfigs.debug/g" ./flutter/android/app/build.gradle
+          fi
           mv ./flutter/android/app/src/main/jniLibs/arm64-v8a/liblibrustdesk.so ./flutter/android/app/src/main/jniLibs/arm64-v8a/librustdesk.so
           mv ./flutter/android/app/src/main/jniLibs/armeabi-v7a/liblibrustdesk.so ./flutter/android/app/src/main/jniLibs/armeabi-v7a/librustdesk.so
           pushd flutter
+          # 1. Gera o APK Universal (para instalacao direta em qualquer celular)
           flutter build apk --release --target-platform android-arm,android-arm64
+          # 2. Gera o Android App Bundle (.aab) para a Google Play Store
+          flutter build appbundle --release
           popd
           mkdir -p ./Output
           mv ./flutter/build/app/outputs/flutter-apk/app-release.apk ./Output/ConexaoSenhaFacil-${{ env.VERSION }}-universal.apk
+          mv ./flutter/build/app/outputs/bundle/release/app-release.aab ./Output/ConexaoSenhaFacil-${{ env.VERSION }}.aab
 
       - name: Upload Universal APK
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: ConexaoSenhaFacil-${{ env.VERSION }}-universal
           path: ./Output/ConexaoSenhaFacil-${{ env.VERSION }}-universal.apk
+
+      - name: Upload Play Store Bundle (AAB)
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: ConexaoSenhaFacil-${{ env.VERSION }}-PlayStore-Bundle
+          path: ./Output/ConexaoSenhaFacil-${{ env.VERSION }}.aab
+
+      - name: Upload Keystore Backup
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: ConexaoSenhaFacil-PlayStore-Keystore-Backup
+          path: |
+            flutter/android/key.properties
+            flutter/android/app/upload-keystore.jks
