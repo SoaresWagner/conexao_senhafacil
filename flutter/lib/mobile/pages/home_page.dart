@@ -150,7 +150,12 @@ class HomePageState extends State<HomePage> {
         ],
       );
     }
-    return Text(bind.mainGetAppNameSync());
+    return Image.asset(
+      'assets/logo.png',
+      height: 38,
+      fit: BoxFit.contain,
+      errorBuilder: (ctx, err, stack) => Text(bind.mainGetAppNameSync()),
+    );
   }
 }
 
